@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Lumenaut Signer</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-base/0.7.6/stellar-base.min.js" integrity="sha256-oILOjlHv0c6JMDtqER8FV6/f2muvxVwU0U5WeRhHyFg=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+	<div class="container">
+		<div class="header">
+			<span class="header-link">
+				<a href="https://www.stellar.org/" class="header-stellar">Stellar</a>
+				<span class="header-separator"> </span>
+				<a href="https://www.lumenaut.net/" class="header-subtitle">multi-sig co-ordinator</a>
+			</span>
+		</div>
+
+		<div class="sign-box" id="drop-zone">
+			<div id="instructions">
+				<h2 class="header-subtitle" id="instructions-text">Inflation transaction signer</h2>
+			</div>
+			<div style="display:none" id="signer">
+				<p id="key-prompt">Secret Key: </p>
+				<input type="text" id="key_input" style="width:100%"><br><br>
+				<button onclick="sign();" id="sign-btn">Sign and upload</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="static/index.js"></script>
+</body>
+</html>

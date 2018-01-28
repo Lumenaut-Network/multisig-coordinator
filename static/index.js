@@ -1,6 +1,18 @@
 var transactions = [];
 var handled = false;
 
+function update_info() {
+	document.getElementById("info-box").style = "display: block";
+
+	var num_transactions = document.getElementById('num-transactions');
+	var cur_signatures = document.getElementById('current-signatures');
+	num_transactions.innerHTML = "Number of transactions: " + transactions.length;
+
+	var xdr = transactions[0];
+	var transaction = new StellarBase.Transaction(xdr);
+	cur_signatures.innerHTML = "Number of signatures: " + transaction.signatures.length;
+}
+
 function handlePostResponse(res) {
 	if (handled) return; handled = true;
 	if (res == "success") {
@@ -40,7 +52,9 @@ function sign() {
 function openSigner(served_transactions) {
 	document.getElementById('instructions').style = "display:none";
 	document.getElementById('signer').style = "display:block";
+
 	transactions = served_transactions;
+	update_info();
 }
 
 var http = new XMLHttpRequest();

@@ -17,8 +17,11 @@
 		</div>
 
 		<div class="content-box" id="info-box">
-			<span id="num-transactions">Number of transactions:</span><br><br>
-			<span id="current-signatures">Current signatures:</span>
+			<p id="done-confirmation" style="display: none">Signature added successfully!</p>
+			<div id="stat-info">
+				<span id="num-transactions">Number of transactions:</span><br><br>
+				<span id="current-signatures">Current signatures:</span>
+			</div>
 		</div>
 
 		<div class="content-box" id="sign-box">
@@ -26,7 +29,8 @@
 				<h2 class="header-subtitle" id="instructions-text">Inflation transaction signer</h2>
 			</div>
 			<div style="display:none" id="signer">
-				<p id="key-prompt">Secret Key: </p>
+				<p id="key-prompt">Signing Key: </p>
+				<p id="conf-msg" style="display: none">Failed</p>
 				<input type="text" id="key_input" style="width:100%"><br><br>
 				<button onclick="sign();" id="sign-btn">Sign and upload</button>
 			</div>

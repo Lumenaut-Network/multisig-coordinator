@@ -1,11 +1,13 @@
 var transactions = [];
 var handled = false;
 
+const phrase = "Lumenaut"
+
 function update_info() {
 	document.getElementById("info-box").style = "display: block";
 
-	var num_transactions = document.getElementById('num-transactions');
-	var cur_signatures = document.getElementById('current-signatures');
+	var num_transactions = document.getElementById("num-transactions");
+	var cur_signatures = document.getElementById("current-signatures");
 	num_transactions.innerHTML = "Number of transactions: " + transactions.length;
 
 	var xdr = transactions[0];
@@ -13,45 +15,69 @@ function update_info() {
 	cur_signatures.innerHTML = "Number of signatures: " + transaction.signatures.length;
 }
 
+function setStyle(id, style) {
+	document.getElementById(id).style = style;
+}
+
+function showMessage(msg, color) {
+	document.getElementById("conf-msg").innerHTML = msg;
+	setStyle("conf-msg", "display: block; color: " + color);
+	setTimeout(function() {
+		setStyle("conf-msg", "display: none");
+	}, 2500);
+}
+
 function handlePostResponse(res) {
 	if (handled) return; handled = true;
-	if (res == "success") {
-		document.getElementById('instructions').style = "display: block";
-		document.getElementById('instructions-text').innerHTML = "Signing success!";
-		document.getElementById('signer').style = "display: none";
+	if (res.status == 200) {
+		setStyle("sign-box", "display: none");
+		setStyle("stat-info", "display: none");
+
+		setStyle("done-confirmation", "display: block; color: rgb(20, 160, 20)")
 	} else {
-		document.getElementById('key-prompt').innerHTML = "Upload failed, try again?";
+		showMessage("Signing failure: " + res.responseText, "rgb(150, 40, 40)");
 	}
 }
 
 function sign() {
-	var key = document.getElementById('key_input').value;
+	var key = document.getElementById("key_input").value;
+	var keypair;
+	try {
+		keypair = StellarBase.Keypair.fromSecret(key);
+	} catch(e) {
+		showMessage("Invalid signing key", "rgb(150, 40, 40)");
+		return;
+	}
+
+	var signature = btoa(String.fromCharCode.apply(null, keypair.sign(phrase)));
+	StellarBase.Network.usePublicNetwork();
+
 	var signed = [];
 	for (var i = transactions.length - 1; i >= 0; i--) {
 		var xdr = transactions[i];
 		var transaction = new StellarBase.Transaction(xdr);
-		var keypair = StellarBase.Keypair.fromSecret(key);
-		StellarBase.Network.useTestNetwork();
 		transaction.sign(keypair);
 		signed.push(transaction.toEnvelope().toXDR("base64"));
 	}
 
-	var json_trans = JSON.stringify(transactions);
+	var data = [keypair.publicKey(), signature, signed];
+	var _json = JSON.stringify(data);
 
 	var post = new XMLHttpRequest();
 	post.open("POST", "/transactions");
 	post.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	post.onreadystatechange = function() { 
 		if (post.readyState == XMLHttpRequest.DONE) {
-			handlePostResponse(post.responseText);
+			handlePostResponse(post);
 		}
 	}
-	post.send(json_trans);
+
+	post.send(_json);
 }
 
 function openSigner(served_transactions) {
-	document.getElementById('instructions').style = "display:none";
-	document.getElementById('signer').style = "display:block";
+	setStyle("instructions", "display:none");
+	setStyle("signer", "display:block");
 
 	transactions = served_transactions;
 	update_info();
